@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <button id="subscribe">Subscribe</button>
+    <button id="publish">Publish</button>
+    <button id="retained">Retained</button>
+    <script type="module">
+      import { Broker } from "../dist/esm/index.js";
+
+      const broker = Broker.getBroker();
+
+      document.querySelector("#publish").addEventListener("click", function() {
+        const data = {
+          foo: "bar",
+          rand: Math.random()
+        };
+        console.log("publish -> data", data);
+        broker.publish("test:topic", data, true);
+      });
+
+      document.querySelector("#subscribe").addEventListener("click", function() {
+        broker.subscribe(["test", "topic"], (data, event) => {
+          console.log("subscribe -> data", data, "info", event.detailInfo, "event", event);
+        });
+      });
+
+      document.querySelector("#retained").addEventListener("click", function() {
+        console.log("retained -> data", broker.getRetained("test:topic"));
+      });
+
+    </script>
+    <style type="text/css">
+      #console {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+      }
+    </style>
+    <script type="application/javascript" src="//cdn.rawgit.com/Alorel/console-log-html/master/console-log-html.min.js"></script>
+    <script type="application/javascript">
+      const $consoleCnt = document.createElement("ul");
+      $consoleCnt.setAttribute("id", "console");
+      document.body.appendChild($consoleCnt);
+      ConsoleLogHTML.connect($consoleCnt, null, true, true, true);
+    </script>
+  </body>
+</html>

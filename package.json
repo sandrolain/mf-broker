@@ -1,0 +1,57 @@
+{
+  "name": "mf-broker",
+  "version": "0.0.1",
+  "description": "Library for micro-frontends communication",
+  "author": "Sandro Lain",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/umd/index.d.ts",
+  "files": [
+    "dist/cjs/*",
+    "dist/esm/*",
+    "dist/umd/*"
+  ],
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:coverage:open": "jest --coverage && open ./coverage/lcov-report/index.html",
+    "docs:build": "npx typedoc --out ./typedocs ./src",
+    "docs:serve": "npm run build:docs && npx open-cli ./typedocs/index.html",
+    "serve": "npm run build && npx live-server --port=5678 --open=/demo/index.html --watch=./dist,./demo",
+    "build": "npx rollup -c",
+    "watch": "npx rollup -cw",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sandrolain/mf-broker.git"
+  },
+  "keywords": [
+    "reactive",
+    "emitter",
+    "observable",
+    "callback",
+    "javascript",
+    "typescript",
+    "library"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@types/jest": "^25.1.4",
+    "@types/node": "^13.9.8",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "eslint": "^6.8.0",
+    "happy-dom": "^0.12.1",
+    "jest": "^25.2.4",
+    "live-server": "^1.2.1",
+    "open-cli": "^6.0.1",
+    "rollup": "^2.3.2",
+    "rollup-plugin-terser": "^5.3.0",
+    "rollup-plugin-typescript2": "^0.27.0",
+    "ts-jest": "^25.3.0",
+    "typedoc": "^0.17.3",
+    "typescript": "^3.8.3"
+  }
+}
