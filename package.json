@@ -1,7 +1,7 @@
 {
   "name": "mf-broker",
   "version": "0.0.1",
-  "description": "Library for micro-frontends communication",
+  "description": "Pub/Sub manager for isolated components",
   "author": "Sandro Lain",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

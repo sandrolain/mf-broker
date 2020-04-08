@@ -1,5 +1,5 @@
-# Synapse: TS/JS library for data propagation
+# Micro Frontend Broker: Pub/Sub manager for isolated components
 
 
-Master: [![Build Status](https://travis-ci.org/sandrolain/synapse.svg?branch=master)](https://travis-ci.org/sandrolain/synapse)  
-Develop: [![Build Status](https://travis-ci.org/sandrolain/synapse.svg?branch=develop)](https://travis-ci.org/sandrolain/synapse)
+Master: [![Build Status](https://travis-ci.org/sandrolain/mf-broker.svg?branch=master)](https://travis-ci.org/sandrolain/mf-broker)  
+Develop: [![Build Status](https://travis-ci.org/sandrolain/mf-broker.svg?branch=develop)](https://travis-ci.org/sandrolain/mf-broker)
