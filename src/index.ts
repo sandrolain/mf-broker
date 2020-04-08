@@ -1,3 +1,4 @@
+import { uuidv4 } from "./tools";
 
 export type BrokerTopic = string | string[];
 export type BrokerTopicCallback<T=any> = (data: T, event: Event) => void;
@@ -13,6 +14,7 @@ export interface BrokerSubscription {
 export interface BrokerCustomEventInfo {
   date: Date;
   retain: boolean;
+  id: string;
 }
 
 export type BrokerCustomEvent<T> = CustomEvent<T> & { detailInfo?: BrokerCustomEventInfo };
@@ -81,9 +83,10 @@ export class Broker {
     const topicStr     = topicAsString(topic);
     const info: BrokerCustomEventInfo = {
       date: new Date(),
-      retain
+      retain,
+      id: uuidv4()
     };
-    const event: BrokerCustomEvent<T>        = new CustomEvent(topicStr, {
+    const event: BrokerCustomEvent<T> = new CustomEvent(topicStr, {
       detail: data,
       bubbles: true,
       cancelable: false,
