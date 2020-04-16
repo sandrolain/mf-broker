@@ -26,8 +26,9 @@ export interface BrokerRetainedData {
 }
 
 interface BrokerTargetExtension {
-  __BrokerRetained: BrokerRetainedMap;
-  __BrokerTargetId: string;
+  __MfBrokerRetained: BrokerRetainedMap;
+  __MfBrokerTargetId: string;
+  __MfBrokerInstance: Broker;
 }
 
 export type BrokerTargetExtended = BrokerTarget & BrokerTargetExtension;
@@ -37,13 +38,13 @@ export class Broker {
 
   constructor (readonly target: BrokerTarget = window) {
     const targetExt = this.target as BrokerTargetExtended;
-    targetExt.__BrokerRetained = new Map();
+    targetExt.__MfBrokerRetained = new Map();
   }
 
   getRetained (topic: BrokerTopic): BrokerRetainedData {
     const targetExt = this.target as BrokerTargetExtended;
     const topicStr     = Broker.topicAsString(topic);
-    const lastPublish  = targetExt.__BrokerRetained.get(topicStr);
+    const lastPublish  = targetExt.__MfBrokerRetained.get(topicStr);
     if(lastPublish) {
       return Object.assign({}, lastPublish);
     }
@@ -59,8 +60,8 @@ export class Broker {
 
     targetExt.addEventListener(topicStr, listener, true);
 
-    if(targetExt.__BrokerRetained) {
-      const lastPublish = targetExt.__BrokerRetained.get(topicStr);
+    if(targetExt.__MfBrokerRetained) {
+      const lastPublish = targetExt.__MfBrokerRetained.get(topicStr);
       if(lastPublish) {
         callback.call(targetExt, lastPublish.data, lastPublish.event);
       }
@@ -101,14 +102,20 @@ export class Broker {
     event.detailInfo = info;
     const retainData = { data, info, event };
     if(info.retain) {
-      targetExt.__BrokerRetained.set(topicStr, retainData);
+      targetExt.__MfBrokerRetained.set(topicStr, retainData);
     }
     target.dispatchEvent(event);
     return retainData;
   }
 
   static getBroker (target: BrokerTarget = window): Broker {
-    return new Broker(target);
+    const targetExt = target as BrokerTargetExtended;
+    if(targetExt.__MfBrokerInstance) {
+      return targetExt.__MfBrokerInstance;
+    }
+    const inst = new Broker(target);
+    targetExt.__MfBrokerInstance = inst;
+    return inst;
   }
 
   static topicAsString (topic: BrokerTopic): string {

@@ -1,6 +1,12 @@
 import { BrokerCustomEventInfo, BrokerTopic, Broker, BrokerTargetExtended, BrokerRetainedData, BrokerTopicCallback, BrokerSubscription } from "./Broker";
 import { uuidv4 } from "./tools";
 
+export interface FramesetBrokerTargetExtension {
+  __MfFramesetBrokerInstance: FramesetBroker;
+}
+
+export type FramesetBrokerTargetExtended = Window & FramesetBrokerTargetExtension;
+
 export interface FramesetBrokerMessage {
   senderId: string;
   id: string;
@@ -28,10 +34,10 @@ export class FramesetBroker {
 
   private getCurrentTargetId (): string {
     const targetExt = this.targetWindow as BrokerTargetExtended;
-    if(!targetExt.__BrokerTargetId) {
-      targetExt.__BrokerTargetId = `T-${uuidv4()}`;
+    if(!targetExt.__MfBrokerTargetId) {
+      targetExt.__MfBrokerTargetId = `T-${uuidv4()}`;
     }
-    return targetExt.__BrokerTargetId;
+    return targetExt.__MfBrokerTargetId;
   }
 
   private initEventPropagationListener (): void {
@@ -60,7 +66,7 @@ export class FramesetBroker {
     const messageData = this.broker.publish<T>(topicStr, data, retain);
     const targetExt   = this.targetWindow as BrokerTargetExtended;
     this.requestEventPropagation({
-      senderId: targetExt.__BrokerTargetId,
+      senderId: targetExt.__MfBrokerTargetId,
       id: `M-${uuidv4()}`,
       topic: topicStr,
       info: messageData.info,
@@ -110,7 +116,13 @@ export class FramesetBroker {
   }
 
   static getBroker (target: Window = window): FramesetBroker {
-    return new FramesetBroker(target);
+    const targetExt = target as FramesetBrokerTargetExtended;
+    if(targetExt.__MfFramesetBrokerInstance) {
+      return targetExt.__MfFramesetBrokerInstance;
+    }
+    const inst = new FramesetBroker(target);
+    targetExt.__MfFramesetBrokerInstance = inst;
+    return inst;
   }
 
 }
