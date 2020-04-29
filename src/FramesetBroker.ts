@@ -1,11 +1,13 @@
-import { BrokerCustomEventInfo, BrokerTopic, Broker, BrokerTargetExtended, BrokerRetainedData, BrokerTopicCallback, BrokerSubscription } from "./Broker";
+import { BrokerCustomEventInfo, BrokerTopic, Broker, BrokerRetainedData, BrokerTopicCallback, BrokerSubscription, BrokerInterface } from "./Broker";
 import { uuidv4 } from "./tools";
 
-export interface FramesetBrokerTargetExtension {
+interface FramesetBrokerTargetExtension {
+  __MfBrokerTargetId: string;
   __MfFramesetBrokerInstance: FramesetBroker;
+  __MfFramesetBrokerHasListener: boolean;
 }
 
-export type FramesetBrokerTargetExtended = Window & FramesetBrokerTargetExtension;
+type FramesetBrokerTargetExtended = Window & FramesetBrokerTargetExtension;
 
 export interface FramesetBrokerMessage {
   senderId: string;
@@ -15,56 +17,35 @@ export interface FramesetBrokerMessage {
   data: any;
 }
 
-export class FramesetBroker {
-  private broker: Broker;
+export class FramesetBroker implements BrokerInterface {
+  private targetWindow: Window;
 
-  // TODO: manage target ad DOM nodes to propagate only to childs
   constructor (
-    readonly targetWindow: Window = window,
+    private broker: Broker,
     readonly acceptedOrigins: string[] = null
   ) {
+    this.targetWindow = broker.getTarget();
+
     if(!this.acceptedOrigins) {
-      this.acceptedOrigins = [this.targetWindow.location.origin];
+      this.acceptedOrigins = [broker.getTarget().location.origin];
     }
 
-    this.getCurrentTargetId();
+    this.getTargetId();
     this.initEventPropagationListener();
-    this.broker = new Broker(this.targetWindow);
   }
 
-  private getCurrentTargetId (): string {
-    const targetExt = this.targetWindow as BrokerTargetExtended;
-    if(!targetExt.__MfBrokerTargetId) {
-      targetExt.__MfBrokerTargetId = `T-${uuidv4()}`;
-    }
-    return targetExt.__MfBrokerTargetId;
+  getTarget (): Window {
+    return this.targetWindow;
   }
 
-  private initEventPropagationListener (): void {
-    this.targetWindow.addEventListener("message", (event: MessageEvent) => {
-      if(this.acceptedOrigins.includes(event.origin)) {
-        const message = event.data;
-        if(this.isFramesetBrokerMessage(message) && !this.isSentFromCurrentTarget(message)) {
-          this.propagateIntoCurrentTarget(message);
-          this.propagateToChildsTargets(message, event.origin);
-        }
-      }
-    });
+  getTargetId (): string {
+    return this.broker.getTargetId();
   }
 
-  private isFramesetBrokerMessage (message: any): boolean {
-    return (message.senderId && message.id && message.info && message.data);
-  }
-
-  private isSentFromCurrentTarget (message: FramesetBrokerMessage): boolean {
-    const currentId = this.getCurrentTargetId();
-    return (message.senderId === currentId);
-  }
-
-  publish<T=any> (topic: BrokerTopic, data: T, retain: boolean = false): void {
+  publish<T=any> (topic: BrokerTopic, data: T, retain: boolean = false): BrokerRetainedData {
     const topicStr    = Broker.topicAsString(topic);
     const messageData = this.broker.publish<T>(topicStr, data, retain);
-    const targetExt   = this.targetWindow as BrokerTargetExtended;
+    const targetExt   = this.targetWindow as FramesetBrokerTargetExtended;
     this.requestEventPropagation({
       senderId: targetExt.__MfBrokerTargetId,
       id: `M-${uuidv4()}`,
@@ -72,6 +53,40 @@ export class FramesetBroker {
       info: messageData.info,
       data: messageData.data
     });
+    return messageData;
+  }
+
+  subscribe<T=any> (topic: BrokerTopic, callback: BrokerTopicCallback<T>): BrokerSubscription {
+    return this.broker.subscribe<T> (topic, callback);
+  }
+
+  getRetained (topic: BrokerTopic): BrokerRetainedData {
+    return this.broker.getRetained(topic);
+  }
+
+  private initEventPropagationListener (): void {
+    const targetExt   = this.targetWindow as FramesetBrokerTargetExtended;
+    if(!targetExt.__MfFramesetBrokerHasListener) {
+      targetExt.addEventListener("message", (event: MessageEvent) => {
+        if(this.acceptedOrigins.includes(event.origin)) {
+          const message = event.data;
+          if(this.isFramesetBrokerMessage(message) && !this.isSentFromCurrentTarget(message)) {
+            this.propagateIntoCurrentTarget(message);
+            this.propagateToChildsTargets(message, event.origin);
+          }
+        }
+      });
+      targetExt.__MfFramesetBrokerHasListener = true;
+    }
+  }
+
+  private isFramesetBrokerMessage (message: any): boolean {
+    return (message.senderId && message.id && message.info && message.data);
+  }
+
+  private isSentFromCurrentTarget (message: FramesetBrokerMessage): boolean {
+    const currentId = this.getTargetId();
+    return (message.senderId === currentId);
   }
 
   private requestEventPropagation (message: FramesetBrokerMessage, targetOrigin: string = this.targetWindow.location.origin): void {
@@ -107,22 +122,11 @@ export class FramesetBroker {
     });
   }
 
-  subscribe<T=any> (topic: BrokerTopic, callback: BrokerTopicCallback<T>): BrokerSubscription {
-    return this.broker.subscribe<T> (topic, callback);
-  }
-
-  getRetained (topic: BrokerTopic): BrokerRetainedData {
-    return this.broker.getRetained(topic);
-  }
-
-  static getBroker (target: Window = window): FramesetBroker {
-    const targetExt = target as FramesetBrokerTargetExtended;
-    if(targetExt.__MfFramesetBrokerInstance) {
-      return targetExt.__MfFramesetBrokerInstance;
+  static getInstance (broker: Broker): FramesetBroker {
+    const targetExt = broker.getTarget() as FramesetBrokerTargetExtended;
+    if(!targetExt.__MfFramesetBrokerInstance) {
+      targetExt.__MfFramesetBrokerInstance = new FramesetBroker(broker);
     }
-    const inst = new FramesetBroker(target);
-    targetExt.__MfFramesetBrokerInstance = inst;
-    return inst;
+    return targetExt.__MfFramesetBrokerInstance;
   }
-
 }

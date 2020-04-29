@@ -7,12 +7,20 @@
     <button id="subscribe">Subscribe</button>
     <button id="publish">Publish</button>
     <button id="retained">Retained</button>
+    <button id="proc1">Call Procedure 1</button>
+    <button id="proc2">Call Procedure 2</button>
+    <br/>
     <br/>
     <a href="index-frame.html">Frameset Broker</a>
     <script type="module">
-      import { Broker } from "../dist/esm/index.js";
+      import { Broker, ProcedureBroker } from "../dist/esm/index.js";
 
-      const broker = Broker.getBroker();
+      const broker = Broker.getInstance();
+      const proc = ProcedureBroker.getInstance(broker);
+
+      proc.register("proc1", (...args) => {
+        return JSON.stringify(args, null, 2);
+      })
 
       document.querySelector("#publish").addEventListener("click", function() {
         const data = {
@@ -31,6 +39,18 @@
 
       document.querySelector("#retained").addEventListener("click", function() {
         console.log("retained -> data", broker.getRetained("test:topic"));
+      });
+
+      document.querySelector("#proc1").addEventListener("click", function() {
+        proc.call("proc1", "foo", 123).then((result) => {
+          alert(result);
+        })
+      });
+
+      document.querySelector("#proc2").addEventListener("click", function() {
+        proc.call("proc2", "foo", 123).catch((err) => {
+          alert(err);
+        });
       });
 
     </script>

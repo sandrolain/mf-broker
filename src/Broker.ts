@@ -2,7 +2,7 @@ import { uuidv4 } from "./tools";
 
 export type BrokerTopic = string | string[];
 export type BrokerTopicCallback<T=any> = (data: T, event: Event) => void;
-export type BrokerTarget = Window | Document | Element;
+export type BrokerTarget = Window | Document | HTMLElement;
 
 export interface BrokerSubscription {
   broker: Broker;
@@ -31,50 +31,35 @@ interface BrokerTargetExtension {
   __MfBrokerInstance: Broker;
 }
 
-export type BrokerTargetExtended = BrokerTarget & BrokerTargetExtension;
+type BrokerTargetExtended = Window & BrokerTargetExtension;
+
 type BrokerRetainedMap = Map<string, BrokerRetainedData>;
 
-export class Broker {
+export interface BrokerInterface {
+  getTarget (): Window;
+  getTargetId (): string;
+  publish<T=any> (topic: BrokerTopic, data: T, retain: boolean): BrokerRetainedData;
+  subscribe<T=any> (topic: BrokerTopic, callback: BrokerTopicCallback<T>): BrokerSubscription;
+  getRetained (topic: BrokerTopic): BrokerRetainedData;
+}
 
-  constructor (readonly target: BrokerTarget = window) {
+export class Broker implements BrokerInterface {
+
+  constructor (readonly target: Window = window) {
     const targetExt = this.target as BrokerTargetExtended;
     targetExt.__MfBrokerRetained = new Map();
   }
 
-  getRetained (topic: BrokerTopic): BrokerRetainedData {
-    const targetExt = this.target as BrokerTargetExtended;
-    const topicStr     = Broker.topicAsString(topic);
-    const lastPublish  = targetExt.__MfBrokerRetained.get(topicStr);
-    if(lastPublish) {
-      return Object.assign({}, lastPublish);
-    }
-    return null;
+  getTarget (): Window {
+    return this.target;
   }
 
-  subscribe<T=any> (topic: BrokerTopic, callback: BrokerTopicCallback<T>): BrokerSubscription {
+  getTargetId (): string {
     const targetExt = this.target as BrokerTargetExtended;
-    const topicStr     = Broker.topicAsString(topic);
-    const listener     = (event: BrokerCustomEvent<T>): void => {
-      callback.call(targetExt, event.detail, event);
-    };
-
-    targetExt.addEventListener(topicStr, listener, true);
-
-    if(targetExt.__MfBrokerRetained) {
-      const lastPublish = targetExt.__MfBrokerRetained.get(topicStr);
-      if(lastPublish) {
-        callback.call(targetExt, lastPublish.data, lastPublish.event);
-      }
+    if(!targetExt.__MfBrokerTargetId) {
+      targetExt.__MfBrokerTargetId = `T-${uuidv4()}`;
     }
-
-    return {
-      broker: this,
-      topic: topicStr,
-      callback,
-      unsubscribe: (): void => {
-        this.target.removeEventListener(topicStr, listener, true);
-      }
-    };
+    return targetExt.__MfBrokerTargetId;
   }
 
   publish<T=any> (topic: BrokerTopic, data: T, retain: boolean = false): BrokerRetainedData {
@@ -108,14 +93,50 @@ export class Broker {
     return retainData;
   }
 
-  static getBroker (target: BrokerTarget = window): Broker {
-    const targetExt = target as BrokerTargetExtended;
-    if(targetExt.__MfBrokerInstance) {
-      return targetExt.__MfBrokerInstance;
+  subscribe<T=any> (topic: BrokerTopic, callback: BrokerTopicCallback<T>): BrokerSubscription {
+    const targetExt = this.target as BrokerTargetExtended;
+    const topicStr     = Broker.topicAsString(topic);
+    const listener     = (event: BrokerCustomEvent<T>): void => {
+      callback.call(targetExt, event.detail, event);
+    };
+
+    targetExt.addEventListener(topicStr, listener, true);
+
+    if(targetExt.__MfBrokerRetained) {
+      const lastPublish = targetExt.__MfBrokerRetained.get(topicStr);
+      if(lastPublish) {
+        callback.call(targetExt, lastPublish.data, lastPublish.event);
+      }
     }
-    const inst = new Broker(target);
-    targetExt.__MfBrokerInstance = inst;
-    return inst;
+
+    return {
+      broker: this,
+      topic: topicStr,
+      callback,
+      unsubscribe: (): void => {
+        this.target.removeEventListener(topicStr, listener, true);
+      }
+    };
+  }
+
+
+
+  getRetained (topic: BrokerTopic): BrokerRetainedData {
+    const targetExt = this.target as BrokerTargetExtended;
+    const topicStr     = Broker.topicAsString(topic);
+    const lastPublish  = targetExt.__MfBrokerRetained.get(topicStr);
+    if(lastPublish) {
+      return Object.assign({}, lastPublish);
+    }
+    return null;
+  }
+
+  static getInstance (target: Window = window): Broker {
+    const targetExt = target as BrokerTargetExtended;
+    if(!targetExt.__MfBrokerInstance) {
+      targetExt.__MfBrokerInstance = new Broker(target);
+    }
+    return targetExt.__MfBrokerInstance;
   }
 
   static topicAsString (topic: BrokerTopic): string {
