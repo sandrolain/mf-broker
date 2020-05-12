@@ -1,6 +1,7 @@
 import { BrokerInterface, Broker, BrokerSubscription } from "./Broker";
 import { uuidv4 } from "./tools";
 
+// TODO: docs
 export type ProcedureCallback<T=any> = (...args: any[]) => T;
 
 interface ProcedureBrokerTargetExtension {
@@ -11,6 +12,7 @@ interface ProcedureBrokerTargetExtension {
 
 type ProcedureBrokerTargetExtended = Window & ProcedureBrokerTargetExtension;
 
+// TODO: docs
 interface ProcedureRequest {
   id: string;
   name: string;
@@ -18,6 +20,7 @@ interface ProcedureRequest {
   resolved: boolean;
 }
 
+// TODO: docs
 interface ProcedureResponse<T=any> {
   id: string;
   name: string;
@@ -28,6 +31,8 @@ interface ProcedureResponse<T=any> {
 const PROCEDURE_REQUEST_TOPIC  = "mf:proc:req";
 const PROCEDURE_RESPONSE_TOPIC = "mf:proc:res";
 
+// TODO: docs
+// TODO: test
 export class ProcedureBroker {
   private targetWindow: Window;
   private registeredCallbacks: Map<string, ProcedureCallback> = new Map();
@@ -42,22 +47,38 @@ export class ProcedureBroker {
     this.initProcedureRequestListener();
   }
 
+  // TODO: docs
+  // TODO: test
+  setReponseTimeout (responseTimeout: number): void {
+    this.responseTimeout = responseTimeout;
+  }
+
+  // TODO: docs
+  // TODO: test
   getTarget (): Window {
     return this.targetWindow;
   }
 
+  // TODO: docs
+  // TODO: test
   getTargetId (): string {
     return this.broker.getTargetId();
   }
 
+  // TODO: docs
+  // TODO: test
   register (name: string, callback: ProcedureCallback): void  {
     this.registeredCallbacks.set(name, callback);
   }
 
+  // TODO: docs
+  // TODO: test
   getCallback (name: string): ProcedureCallback {
     return this.registeredCallbacks.get(name);
   }
 
+  // TODO: docs
+  // TODO: test
   call<T=any> (name: string, ...args: any[]): Promise<T> {
     const request: ProcedureRequest = {
       id: uuidv4(),
@@ -81,7 +102,7 @@ export class ProcedureBroker {
       });
       tou = window.setTimeout(() => {
         subscription.unsubscribe();
-        reject(new Error(`Procedure request timeout for callback with name "${name}"`));
+        reject(new Error(`Procedure request timeout (${this.responseTimeout}) for callback with name "${name}"`));
       }, this.responseTimeout);
       this.broker.publish(PROCEDURE_REQUEST_TOPIC, request, false);
     });
@@ -115,10 +136,12 @@ export class ProcedureBroker {
     return result;
   }
 
-  static getInstance (broker: Broker): ProcedureBroker {
+  // TODO: docs
+  // TODO: test
+  static getInstance (broker: Broker, responseTimeout: number): ProcedureBroker {
     const targetExt = broker.getTarget() as ProcedureBrokerTargetExtended;
     if(!targetExt.__MfProcedureBrokerInstance) {
-      targetExt.__MfProcedureBrokerInstance = new ProcedureBroker(broker);
+      targetExt.__MfProcedureBrokerInstance = new ProcedureBroker(broker, responseTimeout);
     }
     return targetExt.__MfProcedureBrokerInstance;
   }

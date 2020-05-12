@@ -17,6 +17,8 @@ export interface FramesetBrokerMessage {
   data: any;
 }
 
+// TODO: docs
+// TODO: test
 export class FramesetBroker implements BrokerInterface {
   private targetWindow: Window;
 
@@ -34,14 +36,20 @@ export class FramesetBroker implements BrokerInterface {
     this.initEventPropagationListener();
   }
 
+  // TODO: docs
+  // TODO: test
   getTarget (): Window {
     return this.targetWindow;
   }
 
+  // TODO: docs
+  // TODO: test
   getTargetId (): string {
     return this.broker.getTargetId();
   }
 
+  // TODO: docs
+  // TODO: test
   publish<T=any> (topic: BrokerTopic, data: T, retain: boolean = false): BrokerRetainedData {
     const topicStr    = Broker.topicAsString(topic);
     const messageData = this.broker.publish<T>(topicStr, data, retain);
@@ -56,10 +64,14 @@ export class FramesetBroker implements BrokerInterface {
     return messageData;
   }
 
+  // TODO: docs
+  // TODO: test
   subscribe<T=any> (topic: BrokerTopic, callback: BrokerTopicCallback<T>): BrokerSubscription {
     return this.broker.subscribe<T> (topic, callback);
   }
 
+  // TODO: docs
+  // TODO: test
   getRetained (topic: BrokerTopic): BrokerRetainedData {
     return this.broker.getRetained(topic);
   }

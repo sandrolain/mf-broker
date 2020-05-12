@@ -1,0 +1,19 @@
+#console {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #333333;
+  color: #FFFFFF;
+  margin: 0;
+  padding: 0.5em;
+  overflow: auto;
+  max-height: 33vh;
+  box-sizing: border-box;
+}
+
+[data-level="error"] {
+  color: #FF6666;
+}

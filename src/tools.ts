@@ -1,5 +1,4 @@
 
-
 // TODO: replace with tools one
 export function uuidv4 (): string {
   if(window.crypto) {

@@ -1,9 +1,13 @@
 import { uuidv4 } from "./tools";
 
+// TODO: docs
 export type BrokerTopic = string | string[];
+// TODO: docs
 export type BrokerTopicCallback<T=any> = (data: T, event: Event) => void;
+// TODO: docs
 export type BrokerTarget = Window | Document | HTMLElement;
 
+// TODO: docs
 export interface BrokerSubscription {
   broker: Broker;
   topic: string;
@@ -11,14 +15,17 @@ export interface BrokerSubscription {
   unsubscribe: () => void;
 }
 
+// TODO: docs
 export interface BrokerCustomEventInfo {
   date: Date;
   retain: boolean;
   id: string;
 }
 
+// TODO: docs
 export type BrokerCustomEvent<T> = CustomEvent<T> & { detailInfo?: BrokerCustomEventInfo };
 
+// TODO: docs
 export interface BrokerRetainedData {
   info: BrokerCustomEventInfo;
   data: any;
@@ -43,6 +50,7 @@ export interface BrokerInterface {
   getRetained (topic: BrokerTopic): BrokerRetainedData;
 }
 
+// TODO: docs
 export class Broker implements BrokerInterface {
 
   constructor (readonly target: Window = window) {
@@ -50,10 +58,14 @@ export class Broker implements BrokerInterface {
     targetExt.__MfBrokerRetained = new Map();
   }
 
+  // TODO: docs
+  // TODO: test
   getTarget (): Window {
     return this.target;
   }
 
+  // TODO: docs
+  // TODO: test
   getTargetId (): string {
     const targetExt = this.target as BrokerTargetExtended;
     if(!targetExt.__MfBrokerTargetId) {
@@ -62,10 +74,14 @@ export class Broker implements BrokerInterface {
     return targetExt.__MfBrokerTargetId;
   }
 
+  // TODO: docs
+  // TODO: test
   publish<T=any> (topic: BrokerTopic, data: T, retain: boolean = false): BrokerRetainedData {
     return this.publishWithTarget<T>(this.target, topic, data, retain);
   }
 
+  // TODO: docs
+  // TODO: test
   publishWithTarget<T=any> (target: BrokerTarget, topic: BrokerTopic, data: T, retain: boolean = false): BrokerRetainedData {
     const info: BrokerCustomEventInfo = {
       date: new Date(),
@@ -75,6 +91,8 @@ export class Broker implements BrokerInterface {
     return this.publishCustom(target, topic, info, data);
   }
 
+  // TODO: docs
+  // TODO: test
   publishCustom<T=any> (target: BrokerTarget, topic: BrokerTopic, info: BrokerCustomEventInfo, data: T): BrokerRetainedData {
     const targetExt = this.target as BrokerTargetExtended;
     const topicStr  = Broker.topicAsString(topic);
@@ -93,6 +111,8 @@ export class Broker implements BrokerInterface {
     return retainData;
   }
 
+  // TODO: docs
+  // TODO: test
   subscribe<T=any> (topic: BrokerTopic, callback: BrokerTopicCallback<T>): BrokerSubscription {
     const targetExt = this.target as BrokerTargetExtended;
     const topicStr     = Broker.topicAsString(topic);
@@ -119,8 +139,8 @@ export class Broker implements BrokerInterface {
     };
   }
 
-
-
+  // TODO: docs
+  // TODO: test
   getRetained (topic: BrokerTopic): BrokerRetainedData {
     const targetExt = this.target as BrokerTargetExtended;
     const topicStr     = Broker.topicAsString(topic);
@@ -131,6 +151,8 @@ export class Broker implements BrokerInterface {
     return null;
   }
 
+  // TODO: docs
+  // TODO: test
   static getInstance (target: Window = window): Broker {
     const targetExt = target as BrokerTargetExtended;
     if(!targetExt.__MfBrokerInstance) {
@@ -139,6 +161,8 @@ export class Broker implements BrokerInterface {
     return targetExt.__MfBrokerInstance;
   }
 
+  // TODO: docs
+  // TODO: test
   static topicAsString (topic: BrokerTopic): string {
     if(Array.isArray(topic)) {
       topic = topic.join(":");

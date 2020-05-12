@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>mf-broker Demo</title>
+    <style type="text/css"> @import url("./demo-style.css"); </style>
+  </head>
+  <body>
+    <div id="cnt">
+      <div id="btns">
+        <button id="subscribe">Subscribe</button>
+        <button id="publish">Publish</button>
+        <button id="publishr">Publish Retain</button>
+        <button id="retained">Retained</button>
+        <button id="proc1">Call Procedure 1</button>
+        <button id="proc2">Call Procedure 2</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="./index-frame.html">GO to Frameset Broker Demo</a>
+      </div>
+    </div>
+    <script type="module">
+      import { Broker, ProcedureBroker } from "./esm/index.js";
+
+      const broker = Broker.getInstance();
+      const proc = ProcedureBroker.getInstance(broker, 1000);
+
+      proc.register("proc1", (...args) => {
+        return JSON.stringify(args, null, 2);
+      })
+
+      document.querySelector("#publish").addEventListener("click", function() {
+        const data = {
+          foo: "bar",
+          rand: Math.random()
+        };
+        console.log("publish -> data:", data);
+        broker.publish("test:topic", data);
+      });
+
+      document.querySelector("#publishr").addEventListener("click", function() {
+        const data = {
+          foo: "retained",
+          rand: Math.random()
+        };
+        console.log("publish retain -> data:", data);
+        broker.publish("test:topic", data, true);
+      });
+
+      document.querySelector("#subscribe").addEventListener("click", function() {
+        console.log("subscribed to topic");
+        broker.subscribe(["test", "topic"], (data, event) => {
+          console.log("data -> subcription:", data, "info", event.detailInfo, "event", event);
+        });
+      });
+
+      document.querySelector("#retained").addEventListener("click", function() {
+        console.log("retained -> data:", broker.getRetained("test:topic"));
+      });
+
+      document.querySelector("#proc1").addEventListener("click", function() {
+        proc.call("proc1", "foo", 123).then((result) => {
+          alert(result);
+        })
+      });
+
+      document.querySelector("#proc2").addEventListener("click", function() {
+        proc.call("proc2", "foo", 123).catch((err) => {
+          alert(err);
+        });
+      });
+
+    </script>
+    <style type="text/css"> @import url("./console-style.css"); </style>
+    <script type="application/javascript" src="//cdn.rawgit.com/Alorel/console-log-html/master/console-log-html.min.js"></script>
+    <script type="application/javascript" src="./console-config.js"></script>
+  </body>
+</html>
