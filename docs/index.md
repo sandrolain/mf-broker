@@ -2,7 +2,7 @@
 
 <p align="center">
 
-**Micro Frontend Broker**  
+**Micro-Frontends Broker**  
 Pub/Sub manager for isolated components
 
 </p>
