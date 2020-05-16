@@ -3,7 +3,7 @@ import { uuidv4 } from "./tools";
 // TODO: docs
 export type BrokerTopic = string | string[];
 // TODO: docs
-export type BrokerTopicCallback<T=any> = (data: T, event: Event) => void;
+export type BrokerTopicCallback<T=any> = (data: T, event: BrokerCustomEvent<T>) => void;
 // TODO: docs
 export type BrokerTarget = Window | Document | HTMLElement;
 
@@ -125,7 +125,10 @@ export class Broker implements BrokerInterface {
     if(targetExt.__MfBrokerRetained) {
       const lastPublish = targetExt.__MfBrokerRetained.get(topicStr);
       if(lastPublish) {
-        callback.call(targetExt, lastPublish.data, lastPublish.event);
+        // Defer execution
+        setTimeout(() => {
+          callback.call(targetExt, lastPublish.data, lastPublish.event);
+        }, 0);
       }
     }
 
