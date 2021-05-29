@@ -68,25 +68,25 @@ describe("FramesetBroker", () => {
   });
 
   // TODO: JSDOM do not support correctly "origin" into MessageEvent
-  // test("Receive published into child frame", (done) => {
-  //   const frame = window.document.createElement("iframe");
-  //   window.document.body.appendChild(frame);
-  //   const frameWindow = frame.contentWindow;
+  test("Receive published into child frame", (done) => {
+    const frame = window.document.createElement("iframe");
+    window.document.body.appendChild(frame);
+    const frameWindow = frame.contentWindow;
 
-  //   const broker = new FramesetBroker(topFrameBroker);
-  //   const frameBroker = new FramesetBroker(new Broker(frameWindow));
-  //   const subscription = frameBroker.subscribe(["topic", "name", "sub"], (data, event) => {
-  //     subscription.unsubscribe();
-  //     expect(data).toEqual({
-  //       foo: "bar"
-  //     });
-  //     expect(event).toBeInstanceOf(CustomEvent);
-  //     expect(event.detailInfo).toBeDefined();
-  //     done();
-  //   });
-  //   broker.publish("topic:name:sub", {
-  //     foo: "bar"
-  //   });
-  // });
+    const broker = new FramesetBroker(topFrameBroker);
+    const frameBroker = new FramesetBroker(new Broker(frameWindow));
+    const subscription = frameBroker.subscribe(["topic", "name", "sub"], (data, event) => {
+      subscription.unsubscribe();
+      expect(data).toEqual({
+        foo: "bar"
+      });
+      expect(event).toBeInstanceOf(CustomEvent);
+      expect(event.detailInfo).toBeDefined();
+      done();
+    });
+    broker.publish("topic:name:sub", {
+      foo: "bar"
+    });
+  });
 
 });

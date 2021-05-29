@@ -1,4 +1,4 @@
-import { uuidv4 } from "./tools";
+import { v4 as uuidv4 } from "uuid";
 
 // TODO: docs
 export type BrokerTopic = string | string[];
