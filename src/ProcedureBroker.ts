@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
 import { BrokerInterface, Broker, BrokerSubscription } from "./Broker";
+import { uuidv4 } from "./tools";
 
 // TODO: docs
 export type ProcedureCallback<T=any> = (...args: any[]) => T;

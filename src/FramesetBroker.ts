@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
 import { BrokerCustomEventInfo, BrokerTopic, Broker, BrokerRetainedData, BrokerTopicCallback, BrokerSubscription, BrokerInterface } from "./Broker";
+import { uuidv4 } from "./tools";
 
 interface FramesetBrokerTargetExtension {
   __MfBrokerTargetId: string;
