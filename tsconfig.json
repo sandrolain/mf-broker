@@ -16,7 +16,8 @@
       "*": ["node_modules/*", "src/types/*"]
     },
     "declaration": true,
-    "declarationDir": "./dist"
+    "declarationDir": "./dist",
+    "types": ["node", "jest", "jest-environment-puppeteer", "expect-puppeteer"]
   },
   "include": ["src/**/*"],
   "exclude": [

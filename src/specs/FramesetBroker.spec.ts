@@ -1,5 +1,5 @@
-import { Broker } from "./Broker";
-import { FramesetBroker } from "./FramesetBroker";
+import { Broker } from "../Broker";
+import { FramesetBroker } from "../FramesetBroker";
 
 const topFrameBroker = new Broker(window);
 

@@ -1,4 +1,4 @@
-import { Broker } from "./Broker";
+import { Broker } from "../Broker";
 
 describe("Broker", () => {
 
