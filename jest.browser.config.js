@@ -26,9 +26,9 @@ module.exports = {
   ],
   coverageDirectory: "./coverage",
   coverageReporters: ["json", "lcov", "text", "clover"],
-  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  testRegex: "browser.spec.ts$",
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
-  testEnvironment: "jsdom",
+  // testEnvironment: "node",
   globals: {
     "ts-jest": {
       tsConfig: compilerOptions
