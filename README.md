@@ -98,11 +98,11 @@ The build of this package generates two versions:
 
 <table><thead><tr><th>master</th><th>develop</th></tr></thead><tbody><tr><td>
 
-[![Build Status](https://travis-ci.org/sandrolain/mf-broker.svg?branch=master)](https://travis-ci.org/sandrolain/mf-broker)
+[![Node.js CI](https://github.com/sandrolain/mf-broker/actions/workflows/node.js.yml/badge.svg?branch=master)](https://github.com/sandrolain/mf-broker/actions/workflows/node.js.yml)
 
 </td><td>
 
-[![Build Status](https://travis-ci.org/sandrolain/mf-broker.svg?branch=develop)](https://travis-ci.org/sandrolain/mf-broker)
+[![Node.js CI](https://github.com/sandrolain/mf-broker/actions/workflows/node.js.yml/badge.svg?branch=develop)](https://github.com/sandrolain/mf-broker/actions/workflows/node.js.yml)
 
 </td></tr></tbody></table>
 
