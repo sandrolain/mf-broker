@@ -1,7 +1,7 @@
 {
   "name": "mf-broker",
   "version": "0.0.1",
-  "description": "Pub/Sub manager for isolated components",
+  "description": "Pub/Sub manager for isolated micro-frontends",
   "author": "Sandro Lain",
   "main": "dist/umd/index.js",
   "browser": "dist/umd/index.js",
@@ -21,7 +21,9 @@
     "docs:build": "npx typedoc ./src",
     "docs:serve": "npm run docs:build && npx open-cli ./docs/typedocs/index.html",
     "demo:prepare": "npm run build && cp -R ./dist/esm ./docs/demo/",
-    "demo:serve": "npx live-server ./docs/demo "
+    "demo:serve": "npx serve -p 3000 ./docs/demo",
+    "cypress:open": "npx cypress open",
+    "cypress:run": "npm run demo:prepare && concurrently -k \"npm run demo:serve\" \"npx cypress run\""
   },
   "repository": {
     "type": "git",
@@ -38,29 +40,29 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.0.0",
-    "@types/expect-puppeteer": "^4.4.5",
-    "@types/jest": "^26.0.23",
-    "@types/jest-environment-puppeteer": "^4.4.1",
-    "@types/node": "^15.6.1",
-    "@types/puppeteer": "^5.4.3",
-    "@typescript-eslint/eslint-plugin": "^4.25.0",
-    "@typescript-eslint/parser": "^4.25.0",
-    "eslint": "^7.27.0",
-    "expect-puppeteer": "^5.0.4",
-    "happy-dom": "^2.20.1",
-    "jest": "^27.0.2",
-    "jest-environment-puppeteer": "^5.0.4",
-    "jest-puppeteer": "^5.0.4",
-    "live-server": "^1.2.1",
-    "open-cli": "^6.0.1",
-    "puppeteer": "^9.1.1",
-    "rollup": "^2.50.4",
+    "@rollup/plugin-node-resolve": "^13.1.2",
+    "@types/chai": "^4.3.0",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^17.0.5",
+    "@types/uuid": "^8.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.8.1",
+    "@typescript-eslint/parser": "^5.8.1",
+    "concurrently": "^6.5.1",
+    "cypress": "^9.2.0",
+    "eslint": "^8.6.0",
+    "happy-dom": "^2.25.1",
+    "jest": "^27.4.5",
+    "open-cli": "^7.0.1",
+    "rollup": "^2.62.0",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.30.0",
-    "ts-jest": "^27.0.1",
-    "typedoc": "^0.20.36",
-    "typescript": "^4.2.4"
+    "rollup-plugin-typescript2": "^0.31.1",
+    "serve": "^13.0.2",
+    "ts-jest": "^27.1.2",
+    "typedoc": "^0.22.10",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "uuid": "^8.3.2"
   }
 }

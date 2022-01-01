@@ -36,6 +36,15 @@
         broker.publish("test:topic", data);
       });
 
+      document.querySelector("#publishr").addEventListener("click", function() {
+        const data = {
+          foo: "retained",
+          rand: Math.random()
+        };
+        console.log("publish retain -> data:", data);
+        broker.publish("test:topic", data, true);
+      });
+
       document.querySelector("#subscribe").addEventListener("click", function() {
         console.log("subscribed to topic");
         broker.subscribe(["test", "topic"], (data, event) => {

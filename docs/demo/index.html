@@ -11,8 +11,10 @@
         <button id="publish">Publish</button>
         <button id="publishr">Publish Retain</button>
         <button id="retained">Retained</button>
-        <button id="proc1">Call Procedure 1</button>
-        <button id="proc2">Call Procedure 2</button>
+        <button id="proc1">Call Procedure "1"</button>
+        <button id="proc-double">Call Procedure "double"</button>
+        <button id="proc-error">Call Procedure "get-error"</button>
+        <button id="proc2">Call Undefined Procedure</button>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <a href="./index-frame.html">GO to Frameset Broker Demo</a>
       </div>
@@ -20,12 +22,23 @@
     <script type="module">
       import { Broker, ProcedureBroker } from "./esm/index.js";
 
-      const broker = Broker.getInstance();
-      const proc = ProcedureBroker.getInstance(broker, 1000);
+      const broker     = Broker.getInstance();
+      const procBroker = ProcedureBroker.getInstance(broker, 1000);
 
-      proc.register("proc1", (...args) => {
+      window.broker     = broker;
+      window.procBroker = procBroker;
+
+      procBroker.register("proc1", (...args) => {
         return JSON.stringify(args, null, 2);
-      })
+      });
+
+      procBroker.register("double", (num) => {
+        return num * 2;
+      });
+
+      procBroker.register("get-error", async (num) => {
+        throw new Error("Errored procedure");
+      });
 
       document.querySelector("#publish").addEventListener("click", function() {
         const data = {
@@ -57,14 +70,26 @@
       });
 
       document.querySelector("#proc1").addEventListener("click", function() {
-        proc.call("proc1", "foo", 123).then((result) => {
-          alert(result);
+        procBroker.call("proc1", "foo", 123).then((result) => {
+          console.log("proc1 result: ", result);
         })
       });
 
+      document.querySelector("#proc-double").addEventListener("click", function() {
+        procBroker.call("double", 32).then((result) => {
+          console.log("double of 32: ", result);
+        })
+      });
+
+      document.querySelector("#proc-error").addEventListener("click", function() {
+        procBroker.call("get-error",).catch((err) => {
+          console.log("get-error result: ", err);
+        });
+      });
+
       document.querySelector("#proc2").addEventListener("click", function() {
-        proc.call("proc2", "foo", 123).catch((err) => {
-          alert(err);
+        procBroker.call("proc2", "foo", 123).catch((err) => {
+          console.log("proc2 error: ", err);
         });
       });
 

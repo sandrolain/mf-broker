@@ -1,5 +1,6 @@
-import { Broker } from "../Broker";
-import { FramesetBroker } from "../FramesetBroker";
+/// <reference types="jest" />
+
+import { Broker, FramesetBroker } from "..";
 
 const topFrameBroker = new Broker(window);
 

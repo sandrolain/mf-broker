@@ -10,6 +10,7 @@
         Frame TOP
         <button id="subscribe">Subscribe</button>
         <button id="publish">Publish</button>
+        <button id="publishr">Publish Retain</button>
         <button id="retained">Retained</button>
         <button id="proc1">Call Procedure 1</button>
         <button id="proc2">Call Procedure 2</button>
@@ -25,7 +26,18 @@
       const broker = FramesetBroker.getInstance(
         Broker.getInstance()
       );
-      const proc = ProcedureBroker.getInstance(broker, 1000);
+      const procBroker = ProcedureBroker.getInstance(broker, 1000);
+
+      window.broker     = broker;
+      window.procBroker = procBroker;
+
+      procBroker.register("double", (num) => {
+        return num * 2;
+      });
+
+      procBroker.register("get-error", async (num) => {
+        throw new Error("Errored procedure");
+      });
 
 
       document.querySelector("#publish").addEventListener("click", function() {
@@ -35,6 +47,15 @@
         };
         console.log("publish -> data:", data);
         broker.publish("test:topic", data);
+      });
+
+      document.querySelector("#publishr").addEventListener("click", function() {
+        const data = {
+          foo: "retained",
+          rand: Math.random()
+        };
+        console.log("publish retain -> data:", data);
+        broker.publish("test:topic", data, true);
       });
 
       document.querySelector("#subscribe").addEventListener("click", function() {
@@ -49,13 +70,13 @@
       });
 
       document.querySelector("#proc1").addEventListener("click", function() {
-        proc.call("proc1", "foo", 123).then((result) => {
+        procBroker.call("proc1", "foo", 123).then((result) => {
           console.log("procedure result:", result)
         })
       });
 
       document.querySelector("#proc2").addEventListener("click", function() {
-        proc.call("proc2", "foo", 123).catch((err) => {
+        procBroker.call("proc2", "foo", 123).catch((err) => {
           console.error("procedure not exists:", err);
         });
       });

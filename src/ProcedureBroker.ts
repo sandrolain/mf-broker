@@ -1,5 +1,5 @@
 import { BrokerInterface, Broker, BrokerSubscription } from "./Broker";
-import { uuidv4 } from "./tools";
+import { v4 as uuidv4 } from "uuid";
 
 // TODO: docs
 export type ProcedureCallback<T=any> = (...args: any[]) => T;
@@ -34,6 +34,8 @@ const PROCEDURE_RESPONSE_TOPIC = "mf:proc:res";
 // TODO: docs
 // TODO: test
 export class ProcedureBroker {
+  static readonly DEFAULT_TIMEOUT = 1000;
+
   private targetWindow: Window;
   private registeredCallbacks: Map<string, ProcedureCallback> = new Map();
   private subscription: BrokerSubscription;
@@ -138,10 +140,10 @@ export class ProcedureBroker {
 
   // TODO: docs
   // TODO: test
-  static getInstance (broker: Broker, responseTimeout: number): ProcedureBroker {
+  static getInstance (broker: BrokerInterface): ProcedureBroker {
     const targetExt = broker.getTarget() as ProcedureBrokerTargetExtended;
     if(!targetExt.__MfProcedureBrokerInstance) {
-      targetExt.__MfProcedureBrokerInstance = new ProcedureBroker(broker, responseTimeout);
+      targetExt.__MfProcedureBrokerInstance = new ProcedureBroker(broker, ProcedureBroker.DEFAULT_TIMEOUT);
     }
     return targetExt.__MfProcedureBrokerInstance;
   }

@@ -1,4 +1,6 @@
-import { Broker } from "../Broker";
+/// <reference types="jest" />
+
+import { Broker } from "..";
 
 describe("Broker", () => {
 

@@ -1,5 +1,5 @@
 export declare type BrokerTopic = string | string[];
-export declare type BrokerTopicCallback<T = any> = (data: T, event: Event) => void;
+export declare type BrokerTopicCallback<T = any> = (data: T, event: BrokerCustomEvent<T>) => void;
 export declare type BrokerTarget = Window | Document | HTMLElement;
 export interface BrokerSubscription {
     broker: Broker;
