@@ -173,3 +173,15 @@ export class Broker implements BrokerInterface {
     return topic;
   }
 }
+
+export function getBroker (): Broker {
+  return Broker.getInstance();
+}
+
+export function publish<T=any> (topic: BrokerTopic, data: T, retain: boolean = false): BrokerRetainedData {
+  return getBroker().publish(topic, data, retain);
+}
+
+export function publishRetained<T=any> (topic: BrokerTopic, data: T): BrokerRetainedData {
+  return getBroker().publish(topic, data, true);
+}

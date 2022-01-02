@@ -142,3 +142,15 @@ export class FramesetBroker implements BrokerInterface {
     return targetExt.__MfFramesetBrokerInstance;
   }
 }
+
+export function getFramesetBroker (): FramesetBroker {
+  return FramesetBroker.getInstance(Broker.getInstance());
+}
+
+export function publishFrameset<T=any> (topic: BrokerTopic, data: T, retain: boolean = false): BrokerRetainedData {
+  return getFramesetBroker().publish(topic, data, retain);
+}
+
+export function publishRetainedFrameset<T=any> (topic: BrokerTopic, data: T): BrokerRetainedData {
+  return getFramesetBroker().publish(topic, data, true);
+}

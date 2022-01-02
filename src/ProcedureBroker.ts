@@ -1,4 +1,5 @@
 import { BrokerInterface, Broker, BrokerSubscription } from "./Broker";
+import { FramesetBroker } from "./FramesetBroker";
 import { v4 as uuidv4 } from "uuid";
 
 // TODO: docs
@@ -147,4 +148,12 @@ export class ProcedureBroker {
     }
     return targetExt.__MfProcedureBrokerInstance;
   }
+}
+
+export function getProcedureBroker (): ProcedureBroker {
+  return ProcedureBroker.getInstance(Broker.getInstance());
+}
+
+export function getFramesetProcedureBroker (): ProcedureBroker {
+  return ProcedureBroker.getInstance(FramesetBroker.getInstance(Broker.getInstance()));
 }
